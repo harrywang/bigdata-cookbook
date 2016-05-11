@@ -3,7 +3,7 @@ This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and co
 I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
 ### Instructions
-You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly.
+You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly. For a brief introduction about the folder structure, see next section.
 
 1. Install Chef Development Kit at https://downloads.chef.io/chef-dk/mac/
 
@@ -33,6 +33,51 @@ If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
     - to shutdown the virtual Ubuntu, run `sudo poweroff`
 
 5. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
+
+### Cookbook Structure
+You can use `tree` to generate the tree below.
+
+```
+.
+├── .kitchen.yml
+├── Berksfile
+├── Berksfile.lock
+├── LICENSE
+├── README.md
+├── attributes
+│   └── default.rb
+├── chefignore
+├── files
+│   ├── config
+│   │   ├── core-site.xml
+│   │   ├── hadoop-env.sh
+│   │   ├── hdfs-site.xml
+│   │   └── mapred-site.xml
+│   ├── data
+│   │   └── imagine.txt
+│   └── programs
+│       ├── wc_mapper.py
+│       └── wc_reducer.py
+├── metadata.rb
+├── recipes
+│   ├── clean.rb
+│   ├── default.rb
+│   ├── setup.rb
+│   └── word_count.rb
+├── templates
+│   └── default
+└── test
+    └── integration
+        └── default
+
+```
+
+- metadata.rb: basic information about the cookbook - the name is used in the run list
+- .kitchen.yml: specifies OS (ubuntu 14.04), port forwarding, and run-list (format: name_of_cookbook::name_of_recipe)
+- recipes: all configuration commands are stored in this folder
+- files: all files we need to copy to the instance are stored here
+- attributes: all attributes we need (I am not using any in this example)
+- templates: all templates files (.erb files)
 
 (Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: `gem install berkshelf`. If you are starting a new cookbook, you can use `berks cookbook your_cookbook_name` to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
 http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant
