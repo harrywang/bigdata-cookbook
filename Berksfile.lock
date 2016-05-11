@@ -2,6 +2,11 @@ DEPENDENCIES
   hadoop
     path: .
     metadata: true
+  java (~> 1.39.0)
 
 GRAPH
+  apt (3.0.0)
   hadoop (0.1.0)
+    java (>= 0.0.0)
+  java (1.39.0)
+    apt (>= 0.0.0)

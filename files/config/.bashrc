@@ -57,7 +57,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 #HADOOP VARIABLES START
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-7-oracle-amd64
 export HADOOP_INSTALL=/usr/local/hadoop
 export PATH=$PATH:$HADOOP_INSTALL/bin
 export PATH=$PATH:$HADOOP_INSTALL/sbin

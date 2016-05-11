@@ -1,11 +1,7 @@
+include_recipe 'java'
+
 apt_update "update apt sources" do
    action :update
-end
-
-# ssh_known_hosts_entry 'localhost'
-
-apt_package 'default-jdk' do
-  action :install
 end
 
 apt_package 'ssh' do
@@ -98,7 +94,7 @@ end
 
 execute "readlink java" do
     user "hduser"
-    command "readlink -f /usr/bin/javac /usr/lib/jvm/java-7-openjdk-amd64/bin/javac"
+    command "readlink -f /usr/bin/javac /usr/lib/jvm/java-7-oracle-amd64/bin/javac"
 end
 
 cookbook_file '/usr/local/hadoop/etc/hadoop/hadoop-env.sh' do
