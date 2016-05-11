@@ -1,0 +1,7 @@
+DEPENDENCIES
+  hadoop
+    path: .
+    metadata: true
+
+GRAPH
+  hadoop (0.1.0)
