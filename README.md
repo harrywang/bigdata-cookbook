@@ -62,7 +62,7 @@ update-alternatives --config java （only one version of java found)
 nano ~/.bashrc
 
 add the following to the end of the file (ctrl+o save, ctrl+x exit):
-
+```
 #HADOOP VARIABLES START
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 export HADOOP_INSTALL=/usr/local/hadoop
@@ -75,7 +75,7 @@ export YARN_HOME=$HADOOP_INSTALL
 export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
 export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib"
 #HADOOP VARIABLES END
-
+```
 source ~/.bashrc
 $ which javac
 /usr/bin/javac
@@ -93,7 +93,7 @@ sudo chown hduser:hadoop /app/hadoop/tmp
 nano /usr/local/hadoop/etc/hadoop/core-site.xml
 
 enter the following (hadoop temp directory and hdfs uri):
-
+```
 <configuration>
  <property>
   <name>hadoop.tmp.dir</name>
@@ -111,7 +111,7 @@ enter the following (hadoop temp directory and hdfs uri):
   determine the host, port, etc. for a filesystem.</description>
  </property>
 </configuration>
-
+```
 cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
 
 nano /usr/local/hadoop/etc/hadoop/mapred-site.xml
@@ -119,7 +119,7 @@ nano /usr/local/hadoop/etc/hadoop/mapred-site.xml
 The mapred-site.xml file is used to specify which framework is being used for MapReduce.
 
 enter the following:
-
+```
 <configuration>
  <property>
   <name>mapred.job.tracker</name>
@@ -130,7 +130,7 @@ enter the following:
   </description>
  </property>
 </configuration>
-
+```
  create two directories which will contain the namenode and the datanode for this Hadoop installation：
 
  sudo mkdir -p /usr/local/hadoop_store/hdfs/namenode
@@ -141,7 +141,7 @@ enter the following:
  This file is used to specify the directories which will be used as the namenode and the datanode on that host.
 
  enter:
-
+```
  <configuration>
  <property>
   <name>dfs.replication</name>
@@ -160,7 +160,7 @@ enter the following:
    <value>file:/usr/local/hadoop_store/hdfs/datanode</value>
  </property>
 </configuration>
-
+```
 
 make sure to use hduser: Format the New Hadoop Filesystem
 
@@ -200,7 +200,6 @@ stop-all.sh to stop hadoop
 
 http://localhost:50070/ is the web UI for NameNode daemon, you need to setup port forwarding on virtualbox for 50070 and 50090 (Settings --> Network --> part forwarding)
 
-
 http://localhost:50090/status.jsp check secondary namenode
 
 http://localhost:50090/logs/ to see logs
@@ -212,6 +211,6 @@ http://localhost:50090/logs/ to see logs
 
 ### References
 
-http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php
-http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
-http://www.terpconnect.umd.edu/~kpzhang/
+- http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php
+- http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
+- http://www.terpconnect.umd.edu/~kpzhang/
