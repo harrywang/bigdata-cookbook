@@ -31,6 +31,7 @@
 <ol>
 <li><p>Install Chef Development Kit at <a href="https://downloads.chef.io/chef-dk/mac/">https://downloads.chef.io/chef-dk/mac/</a></p></li>
 <li><p>Install virtualization tools (VirtualBox and Vagrant) at <a href="https://learn.chef.io/local-development/rhel/get-set-up/">https://learn.chef.io/local-development/rhel/get-set-up/</a></p></li>
+<li><p>Use cookbook dependency manager Berkshelf to download external cookbooks: run <code>berks install</code> to download the external cookbook. If you are using Mac, the external cookbooks are downloaded to ~/.berkshelf/cookbooks. For example, I use java cookbook (<a href="https://supermarket.chef.io/cookbooks/java">https://supermarket.chef.io/cookbooks/java</a>) to install Oracle Java 7 - you can change the attributes in .kitchen.yml file (such as java version, etc).</p></li>
 <li>
 <p>run <code>kitchen converge</code> to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. Other useful kitchen commands:</p>
 
@@ -120,24 +121,13 @@ If things goes well, you have a Ubuntu 14.04 running with hadoop configured.</li
 </code></pre>
 
 <ul>
-<li>metadata.rb: basic information about the cookbook - the name is used in the run list</li>
+<li>metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc. The cookbook dependencies are also specified in this file.</li>
+<li>Berksfile: this files specifies the source of external cookbooks (<a href="https://supermarket.chef.io">https://supermarket.chef.io</a>), and any external cookbooks</li>
 <li>.kitchen.yml: specifies OS (ubuntu 14.04), port forwarding, and run-list (format: name_of_cookbook::name_of_recipe)</li>
 <li>recipes: all configuration commands are stored in this folder</li>
 <li>files: all files we need to copy to the instance are stored here</li>
 <li>attributes: all attributes we need (I am not using any in this example)</li>
 <li>templates: all templates files (.erb files)</li>
-</ul>
-
-<p>(Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: <code>gem install berkshelf</code>. If you are starting a new cookbook, you can use <code>berks cookbook your_cookbook_name</code> to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
-<a href="http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant">http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant</a></p>
-
-<ul>
-<li>add external cookbook in Berksfile as <code>cookbook 'sudo', '~&gt; 2.9.0'</code> you can go to <a href="https://supermarket.chef.io">https://supermarket.chef.io</a> to search for a cookbook and the berkshelf information is there.</li>
-<li>run <code>berks install</code> to download the external cookbook. If you are using Mac, the external cookbook is downloaded to ~/.berkshelf/cookbooks</li>
-<li>specify the run list in .kitchen.yml</li>
-<li>metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc.</li>
-<li>.kitchen.yml (use <code>kitchen init</code> to generate this file if not already exists): this files specifies information related to run the cookbook, such as driver (vagrant), os (ubuntu), which recipe(s) to run, and part forwarding.</li>
-<li>Berksfile: this files specifies the source of external cookbooks, which is '<a href="https://supermarket.chef.io">https://supermarket.chef.io</a>'</li>
 </ul>
 
 <h3>
@@ -331,16 +321,19 @@ labs    1
 
 <ul>
 <li>To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user <code>sudo adduser hduser vboxsf</code> and then reboot <code>sudo reboot</code>)</li>
-</ul>
+<li>If you are starting a new cookbook, you can use <code>berks cookbook your_cookbook_name</code> to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook: <a href="http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant">http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant</a>
+</li>
+<li>
+<p>You can add external cookbook in Berksfile as <code>cookbook 'java'</code>, you can go to <a href="https://supermarket.chef.io">https://supermarket.chef.io</a> to search for a cookbook and find the related berkshelf information there.</p>
 
 <h3>
 <a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h3>
-
-<ul>
-<li>
-<a href="http://www.terpconnect.umd.edu/%7Ekpzhang/">http://www.terpconnect.umd.edu/~kpzhang/</a> (special thanks to my friend Kunpeng for the course materials)</li>
+</li>
+<li><p><a href="http://www.terpconnect.umd.edu/%7Ekpzhang/">http://www.terpconnect.umd.edu/~kpzhang/</a> (special thanks to my friend Kunpeng for the course materials)</p></li>
 <li><a href="http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php">http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php</a></li>
 <li><a href="http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/">http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/</a></li>
+<li><a href="https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison">https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef">https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef</a></li>
 </ul>
 
       <footer class="site-footer">
@@ -351,15 +344,6 @@ labs    1
 
     </section>
 
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-77568954-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
+  
   </body>
 </html>
