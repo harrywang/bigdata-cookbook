@@ -1,9 +1,9 @@
-This cookbook install Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and setup the system to run a word count python program using Hadoop Streaming API. This cookbook is only tested on Mac
+This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and setup the system to run a simple word count python program using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
 
-I referred to many online tutorials and articles as found in the end of this readme - many thanks to those authors (especially my friend Dr. Kunpeng Zhang)
+I referred to many online tutorials and articles as found in the references section at the end of this readme - many thanks to those authors.
 
 ### Instructions
-https://learn.chef.io/local-development/ubuntu/
+You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly.
 1. Install Chef Development Kit at https://downloads.chef.io/chef-dk/mac/
 2. Install virtualization tools (VirtualBox and Vagrant) at https://learn.chef.io/local-development/rhel/get-set-up/
 3. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. Other useful kitchen commands:
@@ -14,13 +14,19 @@ https://learn.chef.io/local-development/ubuntu/
 If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
 4. login by running `kitchen login`
     - `su hduser` enter 'test' as the password
-    - `source ~/.bashrc` to setup environment
     - `cd ~` go to home
+    - `source ~/.bashrc` to setup environment (optional, if done, you can use `start-all.sh`, `hadoop`, `hdfs` commands without specifying the full path below)
     - `/usr/local/hadoop/sbin/start-all.sh` to start hadoop use `jps` to check
     - `/usr/local/hadoop/bin/hdfs dfs -mkdir -p /data/input` create hadoop input folder `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/input` to remove
     - `/usr/local/hadoop/bin/hdfs dfs -copyFromLocal imagine.txt /data/input` copy text file to input folder
-    - `/usr/local/hadoop/bin/hdfs dfs -ls /data/input` to view the folder
-    - `hadoop jar hadoop-streaming-2.6.0.jar -file /home/hduser/wc_mapper.py -mapper /home/hduser/wc_mapper.py -file /home/hduser/wc_reducer.py -reducer /home/hduser/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
+    - `/usr/local/hadoop/bin/hdfs dfs -ls /data/input` to view the input folder
+    - `/usr/local/hadoop/bin/hadoop jar hadoop-streaming-2.6.0.jar -file /home/hduser/wc_mapper.py -mapper /home/hduser/wc_mapper.py -file /home/hduser/wc_reducer.py -reducer /home/hduser/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
+    - `/usr/local/hadoop/bin/hdfs dfs -ls /data/output` to view the output folder
+    - `/usr/local/hadoop/bin/hdfs dfs -cat /data/output/part-00000` to view the word count result
+    - `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/output` remove the output folder first if you want to re-run the program.
+    - http://localhost:50070/ you can see the WebUI, if you need to do other part-forwarding, you can edit .kitchen.yml file.
+    - to shutdown the virtual Ubuntu, run `sudo poweroff`
+5. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
 
 (Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: `gem install berkshelf`. If you are starting a new cookbook, you can use `berks cookbook your_cookbook_name` to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
 http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant
@@ -31,11 +37,10 @@ http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berk
     - .kitchen.yml (use `kitchen init` to generate this file if not already exists): this files specifies information related to run the cookbook, such as driver (vagrant), os (ubuntu), which recipe(s) to run, and part forwarding.
     - Berksfile: this files specifies the source of external cookbooks, which is 'https://supermarket.chef.io'
 
-### Install Hadoop on Ubuntu 14.04
-
-The following is the command list from tutorial at: http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php
+### Install Hadoop on Ubuntu 14.04 Command List
 
 If you want to manually configure hadoop, you can copy and paste the following commands:
+
 ```
 sudo apt-get --assume-yes update
 sudo apt-get --assume-yes install default-jdk
@@ -162,13 +167,10 @@ make sure to use hduser: Format the New Hadoop Filesystem
 
 `hadoop namenode -format`
 
-
 Note that hadoop namenode -format command should be executed once before we start using Hadoop.
 If this command is executed again after Hadoop has been used, it'll destroy all the data on the Hadoop file system.
 
-start hadoop:
-
-you may need to go to /usr/local/hadoop/sbin to run the following commands:
+start hadoop: you may need to go to /usr/local/hadoop/sbin to run the following commands:
 
 `start-all.sh` or (start-yarn.sh does not seem to start NameNode and DataNode). You may see the following messages:
 
@@ -206,6 +208,6 @@ http://localhost:50090/logs/ to see logs
 
 ### References
 
+- http://www.terpconnect.umd.edu/~kpzhang/ (special thanks to my friend Kunpeng for the course materials)
 - http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php
 - http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
-- http://www.terpconnect.umd.edu/~kpzhang/
