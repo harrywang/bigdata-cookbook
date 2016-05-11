@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Hadoop 101 Cookbook by harrywang</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Hadoop 101 Cookbook</h1>
+          <h2>A simple cookbook for installing and configuring Hadoop 2.6.0 on Ubuntu 14.04</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/harrywang/hadoop-cookbook/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/harrywang/hadoop-cookbook/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/harrywang/hadoop-cookbook" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <p>This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at <a href="https://supermarket.chef.io/cookbooks/hadoop">https://supermarket.chef.io/cookbooks/hadoop</a>. This cookbook is for learning and teaching purpose and only tested on Mac.</p>
+
+<p>I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.</p>
+
+<h3>
+<a id="instructions" class="anchor" href="#instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instructions</h3>
+
+<p>You can follow the official tutorial at <a href="https://learn.chef.io/local-development/ubuntu/">https://learn.chef.io/local-development/ubuntu/</a> to setup Chef local development environment or just follow the links in 1 and 2 below directly. For a brief introduction about the folder structure, see next section.</p>
+
+<ol>
+<li><p>Install Chef Development Kit at <a href="https://downloads.chef.io/chef-dk/mac/">https://downloads.chef.io/chef-dk/mac/</a></p></li>
+<li><p>Install virtualization tools (VirtualBox and Vagrant) at <a href="https://learn.chef.io/local-development/rhel/get-set-up/">https://learn.chef.io/local-development/rhel/get-set-up/</a></p></li>
+<li>
+<p>run <code>kitchen converge</code> to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. Other useful kitchen commands:</p>
+
+<ul>
+<li>
+<code>kitchen create</code>: In this step, Test Kitchen creates an instance of your virtual environment, for example, a CentOS 7 virtual machine.</li>
+<li>
+<code>kitchen converge</code>: In this step, Test Kitchen applies your cookbook to the virtual environment.</li>
+<li>
+<code>kitchen login</code>: In this step, Test Kitchen creates an SSH session into your virtual environment.</li>
+<li>
+<code>kitchen destroy</code>: In this step, Test Kitchen shuts down and destroys your virtual environment.
+If things goes well, you have a Ubuntu 14.04 running with hadoop configured.</li>
+</ul>
+</li>
+<li>
+<p>login by running <code>kitchen login</code></p>
+
+<ul>
+<li>
+<code>su hduser</code> enter 'test' as the password</li>
+<li>
+<code>cd ~</code> go to home</li>
+<li>
+<code>source ~/.bashrc</code> to setup environment (optional, if done, you can use <code>start-all.sh</code>, <code>hadoop</code>, <code>hdfs</code> commands without specifying the full path below)</li>
+<li>
+<code>/usr/local/hadoop/sbin/start-all.sh</code> to start hadoop use <code>jps</code> to check</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -mkdir -p /data/input</code> create hadoop input folder <code>/usr/local/hadoop/bin/hdfs dfs -rm -R /data/input</code> to remove</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -copyFromLocal imagine.txt /data/input</code> copy text file to input folder</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -ls /data/input</code> to view the input folder</li>
+<li>
+<code>/usr/local/hadoop/bin/hadoop jar hadoop-streaming-2.6.0.jar -file /home/hduser/wc_mapper.py -mapper /home/hduser/wc_mapper.py -file /home/hduser/wc_reducer.py -reducer /home/hduser/wc_reducer.py -input /data/input/* -output /data/output</code> to run the word count python mapper and reducer</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -ls /data/output</code> to view the output folder</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -cat /data/output/part-00000</code> to view the word count result</li>
+<li>
+<code>/usr/local/hadoop/bin/hdfs dfs -rm -R /data/output</code> remove the output folder first if you want to re-run the program.</li>
+<li>http://localhost:50070/ you can see the WebUI, if you need to do other part-forwarding, you can edit .kitchen.yml file.</li>
+<li>to shutdown the virtual Ubuntu, run <code>sudo poweroff</code>
+</li>
+</ul>
+</li>
+<li><p>if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run <code>kitchen destroy</code> and then <code>kitchen converge</code> - Note: everything on the old virtual Ubuntu is deleted.</p></li>
+</ol>
+
+<h3>
+<a id="cookbook-structure" class="anchor" href="#cookbook-structure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cookbook Structure</h3>
+
+<p>You can use <code>tree</code> to generate the tree below.</p>
+
+<pre><code>.
+├── .kitchen.yml
+├── Berksfile
+├── Berksfile.lock
+├── LICENSE
+├── README.md
+├── attributes
+│   └── default.rb
+├── chefignore
+├── files
+│   ├── config
+│   │   ├── core-site.xml
+│   │   ├── hadoop-env.sh
+│   │   ├── hdfs-site.xml
+│   │   └── mapred-site.xml
+│   ├── data
+│   │   └── imagine.txt
+│   └── programs
+│       ├── wc_mapper.py
+│       └── wc_reducer.py
+├── metadata.rb
+├── recipes
+│   ├── clean.rb
+│   ├── default.rb
+│   ├── setup.rb
+│   └── word_count.rb
+├── templates
+│   └── default
+└── test
+    └── integration
+        └── default
+
+</code></pre>
+
+<ul>
+<li>metadata.rb: basic information about the cookbook - the name is used in the run list</li>
+<li>.kitchen.yml: specifies OS (ubuntu 14.04), port forwarding, and run-list (format: name_of_cookbook::name_of_recipe)</li>
+<li>recipes: all configuration commands are stored in this folder</li>
+<li>files: all files we need to copy to the instance are stored here</li>
+<li>attributes: all attributes we need (I am not using any in this example)</li>
+<li>templates: all templates files (.erb files)</li>
+</ul>
+
+<p>(Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: <code>gem install berkshelf</code>. If you are starting a new cookbook, you can use <code>berks cookbook your_cookbook_name</code> to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
+<a href="http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant">http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant</a></p>
+
+<ul>
+<li>add external cookbook in Berksfile as <code>cookbook 'sudo', '~&gt; 2.9.0'</code> you can go to <a href="https://supermarket.chef.io">https://supermarket.chef.io</a> to search for a cookbook and the berkshelf information is there.</li>
+<li>run <code>berks install</code> to download the external cookbook. If you are using Mac, the external cookbook is downloaded to ~/.berkshelf/cookbooks</li>
+<li>specify the run list in .kitchen.yml</li>
+<li>metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc.</li>
+<li>.kitchen.yml (use <code>kitchen init</code> to generate this file if not already exists): this files specifies information related to run the cookbook, such as driver (vagrant), os (ubuntu), which recipe(s) to run, and part forwarding.</li>
+<li>Berksfile: this files specifies the source of external cookbooks, which is '<a href="https://supermarket.chef.io">https://supermarket.chef.io</a>'</li>
+</ul>
+
+<h3>
+<a id="install-hadoop-on-ubuntu-1404-command-list" class="anchor" href="#install-hadoop-on-ubuntu-1404-command-list" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install Hadoop on Ubuntu 14.04 Command List</h3>
+
+<p>If you want to manually configure hadoop, you can copy and paste the following commands:</p>
+
+<pre><code>sudo apt-get --assume-yes update
+sudo apt-get --assume-yes install default-jdk
+java -version
+sudo addgroup hadoop
+sudo adduser --ingroup hadoop hduser
+sudo adduser hduser sudo
+sudo apt-get install ssh
+which ssh
+which sshd
+su hduser
+ssh-keygen -t rsa -P ""
+cat $HOME/.ssh/id_rsa.pub &gt;&gt; $HOME/.ssh/authorized_keys (authrized_keys is a file)
+ssh localhost
+cd ~
+wget http://mirrors.sonic.net/apache/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
+tar xvzf hadoop-2.6.0.tar.gz
+cd hadoop-2.6.0/
+sudo mkdir /usr/local/hadoop
+sudo mv * /usr/local/hadoop
+sudo chown -R hduser:hadoop /usr/local/hadoop
+update-alternatives --config java
+</code></pre>
+
+<p><code>nano ~/.bashrc</code>, add the following to the end of the file (ctrl+o save, ctrl+x exit):</p>
+
+<pre><code>#HADOOP VARIABLES START
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export HADOOP_INSTALL=/usr/local/hadoop
+export PATH=$PATH:$HADOOP_INSTALL/bin
+export PATH=$PATH:$HADOOP_INSTALL/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_INSTALL
+export HADOOP_COMMON_HOME=$HADOOP_INSTALL
+export HADOOP_HDFS_HOME=$HADOOP_INSTALL
+export YARN_HOME=$HADOOP_INSTALL
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib"
+#HADOOP VARIABLES END
+</code></pre>
+
+<pre><code>source ~/.bashrc
+which javac
+readlink -f /usr/bin/javac /usr/lib/jvm/java-7-openjdk-amd64/bin/javac
+</code></pre>
+
+<p><code>nano /usr/local/hadoop/etc/hadoop/hadoop-env.sh</code> revise: <code>export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64</code></p>
+
+<pre><code>sudo mkdir -p /app/hadoop/tmp
+sudo chown hduser:hadoop /app/hadoop/tmp
+</code></pre>
+
+<p><code>nano /usr/local/hadoop/etc/hadoop/core-site.xml</code>, enter the following (hadoop temp directory and hdfs uri):</p>
+
+<pre><code>&lt;configuration&gt;
+ &lt;property&gt;
+  &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+  &lt;value&gt;/app/hadoop/tmp&lt;/value&gt;
+  &lt;description&gt;A base for other temporary directories.&lt;/description&gt;
+ &lt;/property&gt;
+
+ &lt;property&gt;
+  &lt;name&gt;fs.default.name&lt;/name&gt;
+  &lt;value&gt;hdfs://localhost:54310&lt;/value&gt;
+  &lt;description&gt;The name of the default file system.  A URI whose
+  scheme and authority determine the FileSystem implementation.  The
+  uri's scheme determines the config property (fs.SCHEME.impl) naming
+  the FileSystem implementation class.  The uri's authority is used to
+  determine the host, port, etc. for a filesystem.&lt;/description&gt;
+ &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<pre><code>cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
+nano /usr/local/hadoop/etc/hadoop/mapred-site.xml
+</code></pre>
+
+<p>The mapred-site.xml file is used to specify which framework is being used for MapReduce.</p>
+
+<p>enter the following:</p>
+
+<pre><code>&lt;configuration&gt;
+ &lt;property&gt;
+  &lt;name&gt;mapred.job.tracker&lt;/name&gt;
+  &lt;value&gt;localhost:54311&lt;/value&gt;
+  &lt;description&gt;The host and port that the MapReduce job tracker runs
+  at.  If "local", then jobs are run in-process as a single map
+  and reduce task.
+  &lt;/description&gt;
+ &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<p>create two directories which will contain the namenode and the datanode for this Hadoop installation：</p>
+
+<pre><code> sudo mkdir -p /usr/local/hadoop_store/hdfs/namenode
+ sudo mkdir -p /usr/local/hadoop_store/hdfs/datanode
+</code></pre>
+
+<p><code>nano /usr/local/hadoop/etc/hadoop/hdfs-site.xml</code>, This file is used to specify the directories which will be used as the namenode and the datanode on that host, enter:</p>
+
+<pre><code> &lt;configuration&gt;
+ &lt;property&gt;
+  &lt;name&gt;dfs.replication&lt;/name&gt;
+  &lt;value&gt;1&lt;/value&gt;
+  &lt;description&gt;Default block replication.
+  The actual number of replications can be specified when the file is created.
+  The default is used if replication is not specified in create time.
+  &lt;/description&gt;
+ &lt;/property&gt;
+ &lt;property&gt;
+   &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;
+   &lt;value&gt;file:/usr/local/hadoop_store/hdfs/namenode&lt;/value&gt;
+ &lt;/property&gt;
+ &lt;property&gt;
+   &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;
+   &lt;value&gt;file:/usr/local/hadoop_store/hdfs/datanode&lt;/value&gt;
+ &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<p>make sure to use hduser: Format the New Hadoop Filesystem</p>
+
+<p><code>hadoop namenode -format</code></p>
+
+<p>Note that hadoop namenode -format command should be executed once before we start using Hadoop.
+If this command is executed again after Hadoop has been used, it'll destroy all the data on the Hadoop file system.</p>
+
+<p>start hadoop: you may need to go to /usr/local/hadoop/sbin to run the following commands:</p>
+
+<p><code>start-all.sh</code> or (start-yarn.sh does not seem to start NameNode and DataNode). You may see the following messages:</p>
+
+<pre><code>The authenticity of host 'localhost (::1)' can't be established.
+ECDSA key fingerprint is 4c:94:0a:9e:a4:69:0f:f0:e8:c9:31:ac:0d:55:ba:36.
+Are you sure you want to continue connecting (yes/no)? yes
+
+The authenticity of host '0.0.0.0 (0.0.0.0)' can't be established.
+ECDSA key fingerprint is 4c:94:0a:9e:a4:69:0f:f0:e8:c9:31:ac:0d:55:ba:36.
+Are you sure you want to continue connecting (yes/no)? yes
+</code></pre>
+
+<p>use jps (Java Virtual Machine Process Status Tool) to check whether hadoop is running or not：</p>
+
+<pre><code>$ jps
+14437 NameNode
+14559 DataNode
+14711 SecondaryNameNode
+14845 ResourceManager
+15226 Jps
+14942 NodeManager
+</code></pre>
+
+<p><code>stop-all.sh</code> to stop hadoop</p>
+
+<p>http://localhost:50070/ is the web UI for NameNode daemon, you need to setup port forwarding on virtualbox for 50070 and 50090 (Settings --&gt; Network --&gt; part forwarding)</p>
+
+<p>http://localhost:50090/status.jsp check secondary namenode</p>
+
+<p>http://localhost:50090/logs/ to see logs</p>
+
+<h3>
+<a id="other-useful-tips" class="anchor" href="#other-useful-tips" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Other useful tips</h3>
+
+<ul>
+<li>To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user <code>sudo adduser hduser vboxsf</code> and then reboot <code>sudo reboot</code>)</li>
+</ul>
+
+<h3>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h3>
+
+<ul>
+<li>
+<a href="http://www.terpconnect.umd.edu/%7Ekpzhang/">http://www.terpconnect.umd.edu/~kpzhang/</a> (special thanks to my friend Kunpeng for the course materials)</li>
+<li><a href="http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php">http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php</a></li>
+<li><a href="http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/">http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/</a></li>
+</ul>
+        </section>
+
+        <footer>
+          Hadoop 101 Cookbook is maintained by <a href="https://github.com/harrywang">harrywang</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
