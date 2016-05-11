@@ -1,4 +1,4 @@
-This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
+This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "Imagine" by John Lennon) using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
 
 I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
