@@ -4,15 +4,20 @@ I referred to many online tutorials and articles as found in the references sect
 
 ### Instructions
 You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly.
+
 1. Install Chef Development Kit at https://downloads.chef.io/chef-dk/mac/
+
 2. Install virtualization tools (VirtualBox and Vagrant) at https://learn.chef.io/local-development/rhel/get-set-up/
+
 3. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. Other useful kitchen commands:
     - `kitchen create`: In this step, Test Kitchen creates an instance of your virtual environment, for example, a CentOS 7 virtual machine.
     - `kitchen converge`: In this step, Test Kitchen applies your cookbook to the virtual environment.
     - `kitchen login`: In this step, Test Kitchen creates an SSH session into your virtual environment.
     - `kitchen destroy`: In this step, Test Kitchen shuts down and destroys your virtual environment.
 If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
+
 4. login by running `kitchen login`
+
     - `su hduser` enter 'test' as the password
     - `cd ~` go to home
     - `source ~/.bashrc` to setup environment (optional, if done, you can use `start-all.sh`, `hadoop`, `hdfs` commands without specifying the full path below)
@@ -26,10 +31,12 @@ If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
     - `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/output` remove the output folder first if you want to re-run the program.
     - http://localhost:50070/ you can see the WebUI, if you need to do other part-forwarding, you can edit .kitchen.yml file.
     - to shutdown the virtual Ubuntu, run `sudo poweroff`
+
 5. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
 
 (Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: `gem install berkshelf`. If you are starting a new cookbook, you can use `berks cookbook your_cookbook_name` to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
 http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant
+
     - add external cookbook in Berksfile as `cookbook 'sudo', '~> 2.9.0'` you can go to https://supermarket.chef.io to search for a cookbook and the berkshelf information is there.
     - run `berks install` to download the external cookbook. If you are using Mac, the external cookbook is downloaded to ~/.berkshelf/cookbooks
     - specify the run list in .kitchen.yml
