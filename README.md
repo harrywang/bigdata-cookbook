@@ -36,20 +36,20 @@ http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berk
 The following is the command list from tutorial at: http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php
 
 If you want to manually configure hadoop, you can copy and paste the following commands:
-
+```
 sudo apt-get --assume-yes update
 sudo apt-get --assume-yes install default-jdk
 java -version
 sudo addgroup hadoop
-sudo adduser --ingroup hadoop hduser (how to create a user with information in chef)
+sudo adduser --ingroup hadoop hduser
 sudo adduser hduser sudo
 sudo apt-get install ssh
 which ssh
 which sshd
-su hduser (substitute user)
-ssh-keygen -t rsa -P "" （need to Enter file in which to save the key (/home/hduser/.ssh/id_rsa):)
+su hduser
+ssh-keygen -t rsa -P ""
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys (authrized_keys is a file)
-ssh localhost (test ssh)
+ssh localhost
 cd ~
 wget http://mirrors.sonic.net/apache/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
 tar xvzf hadoop-2.6.0.tar.gz
@@ -57,11 +57,11 @@ cd hadoop-2.6.0/
 sudo mkdir /usr/local/hadoop
 sudo mv * /usr/local/hadoop
 sudo chown -R hduser:hadoop /usr/local/hadoop
-update-alternatives --config java （only one version of java found)
+update-alternatives --config java
+```
 
-nano ~/.bashrc
+`nano ~/.bashrc`, add the following to the end of the file (ctrl+o save, ctrl+x exit):
 
-add the following to the end of the file (ctrl+o save, ctrl+x exit):
 ```
 #HADOOP VARIABLES START
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
@@ -76,23 +76,21 @@ export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
 export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib"
 #HADOOP VARIABLES END
 ```
+
+```
 source ~/.bashrc
-$ which javac
-/usr/bin/javac
+which javac
 readlink -f /usr/bin/javac /usr/lib/jvm/java-7-openjdk-amd64/bin/javac
+```
+`nano /usr/local/hadoop/etc/hadoop/hadoop-env.sh` revise: `export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64`
 
-nano /usr/local/hadoop/etc/hadoop/hadoop-env.sh
-
-revise: export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
-
-
+```
 sudo mkdir -p /app/hadoop/tmp
 sudo chown hduser:hadoop /app/hadoop/tmp
+```
 
+`nano /usr/local/hadoop/etc/hadoop/core-site.xml`, enter the following (hadoop temp directory and hdfs uri):
 
-nano /usr/local/hadoop/etc/hadoop/core-site.xml
-
-enter the following (hadoop temp directory and hdfs uri):
 ```
 <configuration>
  <property>
@@ -112,10 +110,11 @@ enter the following (hadoop temp directory and hdfs uri):
  </property>
 </configuration>
 ```
+
+```
 cp /usr/local/hadoop/etc/hadoop/mapred-site.xml.template /usr/local/hadoop/etc/hadoop/mapred-site.xml
-
 nano /usr/local/hadoop/etc/hadoop/mapred-site.xml
-
+```
 The mapred-site.xml file is used to specify which framework is being used for MapReduce.
 
 enter the following:
@@ -132,15 +131,12 @@ enter the following:
 </configuration>
 ```
  create two directories which will contain the namenode and the datanode for this Hadoop installation：
-
+```
  sudo mkdir -p /usr/local/hadoop_store/hdfs/namenode
  sudo mkdir -p /usr/local/hadoop_store/hdfs/datanode
+```
+ `nano /usr/local/hadoop/etc/hadoop/hdfs-site.xml`, This file is used to specify the directories which will be used as the namenode and the datanode on that host, enter:
 
- nano /usr/local/hadoop/etc/hadoop/hdfs-site.xml
-
- This file is used to specify the directories which will be used as the namenode and the datanode on that host.
-
- enter:
 ```
  <configuration>
  <property>
@@ -164,7 +160,7 @@ enter the following:
 
 make sure to use hduser: Format the New Hadoop Filesystem
 
-hadoop namenode -format
+`hadoop namenode -format`
 
 
 Note that hadoop namenode -format command should be executed once before we start using Hadoop.
@@ -174,8 +170,9 @@ start hadoop:
 
 you may need to go to /usr/local/hadoop/sbin to run the following commands:
 
-start-all.sh or (start-yarn.sh does not seem to start NameNode and DataNode)
+`start-all.sh` or (start-yarn.sh does not seem to start NameNode and DataNode). You may see the following messages:
 
+```
 The authenticity of host 'localhost (::1)' can't be established.
 ECDSA key fingerprint is 4c:94:0a:9e:a4:69:0f:f0:e8:c9:31:ac:0d:55:ba:36.
 Are you sure you want to continue connecting (yes/no)? yes
@@ -183,10 +180,10 @@ Are you sure you want to continue connecting (yes/no)? yes
 The authenticity of host '0.0.0.0 (0.0.0.0)' can't be established.
 ECDSA key fingerprint is 4c:94:0a:9e:a4:69:0f:f0:e8:c9:31:ac:0d:55:ba:36.
 Are you sure you want to continue connecting (yes/no)? yes
-
+```
 
 use jps (Java Virtual Machine Process Status Tool) to check whether hadoop is running or not：
-
+```
 $ jps
 14437 NameNode
 14559 DataNode
@@ -194,9 +191,8 @@ $ jps
 14845 ResourceManager
 15226 Jps
 14942 NodeManager
-
-stop-all.sh to stop hadoop
-
+```
+`stop-all.sh` to stop hadoop
 
 http://localhost:50070/ is the web UI for NameNode daemon, you need to setup port forwarding on virtualbox for 50070 and 50090 (Settings --> Network --> part forwarding)
 
@@ -207,7 +203,6 @@ http://localhost:50090/logs/ to see logs
 ### Other useful tips
 
 - To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user `sudo adduser hduser vboxsf` and then reboot `sudo reboot`)
-
 
 ### References
 
