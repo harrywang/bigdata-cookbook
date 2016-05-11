@@ -37,12 +37,12 @@ If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
 (Optional) Install Berkshelf: if you want to revise the cookbook to use external cookbooks, you need berkshelf: `gem install berkshelf`. If you are starting a new cookbook, you can use `berks cookbook your_cookbook_name` to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook:
 http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant
 
-    - add external cookbook in Berksfile as `cookbook 'sudo', '~> 2.9.0'` you can go to https://supermarket.chef.io to search for a cookbook and the berkshelf information is there.
-    - run `berks install` to download the external cookbook. If you are using Mac, the external cookbook is downloaded to ~/.berkshelf/cookbooks
-    - specify the run list in .kitchen.yml
-    - metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc.
-    - .kitchen.yml (use `kitchen init` to generate this file if not already exists): this files specifies information related to run the cookbook, such as driver (vagrant), os (ubuntu), which recipe(s) to run, and part forwarding.
-    - Berksfile: this files specifies the source of external cookbooks, which is 'https://supermarket.chef.io'
+- add external cookbook in Berksfile as `cookbook 'sudo', '~> 2.9.0'` you can go to https://supermarket.chef.io to search for a cookbook and the berkshelf information is there.
+- run `berks install` to download the external cookbook. If you are using Mac, the external cookbook is downloaded to ~/.berkshelf/cookbooks
+- specify the run list in .kitchen.yml
+- metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc.
+- .kitchen.yml (use `kitchen init` to generate this file if not already exists): this files specifies information related to run the cookbook, such as driver (vagrant), os (ubuntu), which recipe(s) to run, and part forwarding.
+- Berksfile: this files specifies the source of external cookbooks, which is 'https://supermarket.chef.io'
 
 ### Install Hadoop on Ubuntu 14.04 Command List
 
