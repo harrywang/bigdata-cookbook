@@ -254,6 +254,31 @@ http://localhost:50090/status.jsp check secondary namenode
 
 http://localhost:50090/logs/ to see logs
 
+You can locally test the python mapper and reducer as follows:
+
+`echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py`
+
+```
+foo	    1
+foo	    1
+bar	    1
+labs	1
+foo	    1
+bar	    1
+```
+
+`echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py | sort -k1,1 | /home/hduser/wc_reducer.py`
+
+```
+bar	    2
+foo	    3
+labs	1
+```
+
+`sort`: http://www.theunixschool.com/2012/08/linux-sort-command-examples.html
+
+example: `sort -t"," -k1,1 file` The format of '-k' is : '-km,n' where m is the starting key and n is the ending key. In other words, sort can be used to sort on a range of fields just like how the group by in sql does. In our case, since the sorting is on the 1st field alone, we speciy '1,1'. Note: For a file which has fields delimited by a space or a tab, there is no need to specify the "-t" option since the white space is the delimiter by default in sort.
+
 ### Other useful tips
 
 - To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user `sudo adduser hduser vboxsf` and then reboot `sudo reboot`)
