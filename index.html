@@ -303,6 +303,29 @@ Are you sure you want to continue connecting (yes/no)? yes
 
 <p>http://localhost:50090/logs/ to see logs</p>
 
+<p>You can locally test the python mapper and reducer as follows:</p>
+
+<p><code>echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py</code></p>
+
+<pre><code>foo     1
+foo     1
+bar     1
+labs    1
+foo     1
+bar     1
+</code></pre>
+
+<p><code>echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py | sort -k1,1 | /home/hduser/wc_reducer.py</code></p>
+
+<pre><code>bar     2
+foo     3
+labs    1
+</code></pre>
+
+<p><code>sort</code>: <a href="http://www.theunixschool.com/2012/08/linux-sort-command-examples.html">http://www.theunixschool.com/2012/08/linux-sort-command-examples.html</a></p>
+
+<p>example: <code>sort -t"," -k1,1 file</code> The format of '-k' is : '-km,n' where m is the starting key and n is the ending key. In other words, sort can be used to sort on a range of fields just like how the group by in sql does. In our case, since the sorting is on the 1st field alone, we speciy '1,1'. Note: For a file which has fields delimited by a space or a tab, there is no need to specify the "-t" option since the white space is the delimiter by default in sort.</p>
+
 <h3>
 <a id="other-useful-tips" class="anchor" href="#other-useful-tips" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Other useful tips</h3>
 
@@ -328,15 +351,6 @@ Are you sure you want to continue connecting (yes/no)? yes
 
     </section>
 
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-77568954-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
+  
   </body>
 </html>
