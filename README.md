@@ -1,6 +1,6 @@
-This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and setup the system to run a simple word count python program using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
+This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
 
-I referred to many online tutorials and articles as found in the references section at the end of this readme - many thanks to those authors.
+I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
 ### Instructions
 You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly.
