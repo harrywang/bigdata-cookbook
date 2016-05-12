@@ -1,7 +1,7 @@
 This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at https://supermarket.chef.io/. This cookbook is for learning and teaching purpose and only tested on Mac. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
 - Hadoop: hadoop recipe installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "[Imagine](https://www.youtube.com/watch?v=DVg2EJvvlF8)" by John Lennon) using Hadoop Streaming API.
-- Spark:
+- Spark: spark recipe install spark 1.6.0. pre-built for Hadoop 2.6 and later.
 
 
 ### Instructions
@@ -13,7 +13,7 @@ You can follow the official tutorial at https://learn.chef.io/local-development/
 
 3. Use cookbook dependency manager Berkshelf to download external cookbooks: run `berks install` to download the external cookbook. If you are using Mac, the external cookbooks are downloaded to ~/.berkshelf/cookbooks. For example, I use java cookbook (https://supermarket.chef.io/cookbooks/java) to install Oracle Java 7 - you can change the attributes in .kitchen.yml file (such as java version, etc).
 
-4. Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook only setup hadoop with word count example. If you want to setup other systems, you need to uncomment the corresponding recipes in /recipes/default.rb.
+4. Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook only installs hadoop with word count example. If you want to setup other systems, you need to uncomment the corresponding recipes in /recipes/default.rb.
 
 5. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
 
