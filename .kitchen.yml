@@ -1,6 +1,8 @@
 ---
 driver:
   name: vagrant
+  customize:
+    memory: 2048
 
 provisioner:
   name: chef_solo
@@ -16,7 +18,7 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[hadoop::default]
+      - recipe[bigdata::default]
     attributes:
       java:
         install_flavor: oracle

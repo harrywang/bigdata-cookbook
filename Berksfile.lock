@@ -1,12 +1,12 @@
 DEPENDENCIES
-  hadoop
+  bigdata
     path: .
     metadata: true
   java (~> 1.39.0)
 
 GRAPH
   apt (3.0.0)
-  hadoop (0.1.0)
+  bigdata (0.1.1)
     java (>= 0.0.0)
   java (1.39.0)
     apt (>= 0.0.0)

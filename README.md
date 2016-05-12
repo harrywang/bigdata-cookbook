@@ -1,6 +1,8 @@
-This cookbook installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "[Imagine](https://www.youtube.com/watch?v=DVg2EJvvlF8)" by John Lennon) using Hadoop Streaming API. Note that there are professionally developed cookbooks for Hadoop such as the one found at https://supermarket.chef.io/cookbooks/hadoop. This cookbook is for learning and teaching purpose and only tested on Mac.
+This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at https://supermarket.chef.io/. This cookbook is for learning and teaching purpose and only tested on Mac. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
-I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
+- Hadoop: hadoop recipe installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "[Imagine](https://www.youtube.com/watch?v=DVg2EJvvlF8)" by John Lennon) using Hadoop Streaming API.
+- Spark:
+
 
 ### Instructions
 You can follow the official tutorial at https://learn.chef.io/local-development/ubuntu/ to setup Chef local development environment or just follow the links in 1 and 2 below directly. For a brief introduction about the folder structure, see next section.
@@ -11,30 +13,41 @@ You can follow the official tutorial at https://learn.chef.io/local-development/
 
 3. Use cookbook dependency manager Berkshelf to download external cookbooks: run `berks install` to download the external cookbook. If you are using Mac, the external cookbooks are downloaded to ~/.berkshelf/cookbooks. For example, I use java cookbook (https://supermarket.chef.io/cookbooks/java) to install Oracle Java 7 - you can change the attributes in .kitchen.yml file (such as java version, etc).
 
-4. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. Other useful kitchen commands:
-    - `kitchen create`: In this step, Test Kitchen creates an instance of your virtual environment, for example, a CentOS 7 virtual machine.
-    - `kitchen converge`: In this step, Test Kitchen applies your cookbook to the virtual environment.
-    - `kitchen login`: In this step, Test Kitchen creates an SSH session into your virtual environment.
-    - `kitchen destroy`: In this step, Test Kitchen shuts down and destroys your virtual environment.
-If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
+4. Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook only setup hadoop with word count example. If you want to setup other systems, you need to uncomment the corresponding recipes in /recipes/default.rb.
 
-5. login by running `kitchen login`
+5. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
 
-    - `su hduser` enter 'test' as the password
+    Other useful kitchen commands:
+    - `kitchen create`: Test Kitchen creates an instance of your virtual environment, for example, a Ubuntu 14.04 virtual machine.
+    - `kitchen converge`: Test Kitchen applies your cookbook to the virtual environment, it also creates an instance if not already existed.
+    - `kitchen login`: Test Kitchen creates an SSH session into your virtual environment.
+    - `kitchen destroy`: Test Kitchen shuts down and destroys your virtual environment.
+
+6. login by running `kitchen login`
+
+    You need to login as the dbuser:
+    - `su bduser` enter 'test' as the password
     - `cd ~` go to home
     - `source ~/.bashrc` to setup environment (optional, if done, you can use `start-all.sh`, `hadoop`, `hdfs` commands without specifying the full path below)
+
+    For Hadoop:
     - `/usr/local/hadoop/sbin/start-all.sh` to start hadoop use `jps` to check
     - `/usr/local/hadoop/bin/hdfs dfs -mkdir -p /data/input` create hadoop input folder `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/input` to remove
-    - `/usr/local/hadoop/bin/hdfs dfs -copyFromLocal imagine.txt /data/input` copy text file to input folder
+    - `/usr/local/hadoop/bin/hdfs dfs -copyFromLocal ./data/imagine.txt /data/input` copy text file to input folder
     - `/usr/local/hadoop/bin/hdfs dfs -ls /data/input` to view the input folder
-    - `/usr/local/hadoop/bin/hadoop jar hadoop-streaming-2.6.0.jar -file /home/hduser/wc_mapper.py -mapper /home/hduser/wc_mapper.py -file /home/hduser/wc_reducer.py -reducer /home/hduser/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
+    - `/usr/local/hadoop/bin/hadoop jar hadoop-streaming-2.6.0.jar -mapper /home/bduser/programs/hadoop/wc_mapper.py -reducer /home/bduser/programs/hadoop/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
     - `/usr/local/hadoop/bin/hdfs dfs -ls /data/output` to view the output folder
     - `/usr/local/hadoop/bin/hdfs dfs -cat /data/output/part-00000` to view the word count result
     - `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/output` remove the output folder first if you want to re-run the program.
     - http://localhost:50070/ you can see the WebUI, if you need to do other part-forwarding, you can edit .kitchen.yml file.
     - to shutdown the virtual Ubuntu, run `sudo poweroff`
 
-6. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
+    For Spark:
+    - `cd /home/bduser/spark-1.6.0-bin-hadoop2.6`
+    - To run Spark interactively in a Python interpreter: `./bin/pyspark --master local[2]`, the --master option specifies the master URL for a distributed cluster, or local to run locally with one thread, or local[N] to run locally with N threads.
+    - Run an example: `./bin/spark-submit examples/src/main/python/pi.py 10`
+
+7. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
 
 ### Cookbook Structure
 You can use `tree` to generate the tree below.
@@ -47,31 +60,15 @@ You can use `tree` to generate the tree below.
 ├── LICENSE
 ├── README.md
 ├── attributes
-│   └── default.rb
 ├── chefignore
 ├── files
 │   ├── config
-│   │   ├── core-site.xml
-│   │   ├── hadoop-env.sh
-│   │   ├── hdfs-site.xml
-│   │   └── mapred-site.xml
 │   ├── data
-│   │   └── imagine.txt
 │   └── programs
-│       ├── wc_mapper.py
-│       └── wc_reducer.py
 ├── metadata.rb
 ├── recipes
-│   ├── clean.rb
-│   ├── default.rb
-│   ├── setup.rb
-│   └── word_count.rb
 ├── templates
-│   └── default
 └── test
-    └── integration
-        └── default
-
 ```
 
 - metadata.rb: this file specifies meta data for the cookbook, such as name, author, external cookbook dependencies, etc. The cookbook dependencies are also specified in this file.
@@ -82,7 +79,9 @@ You can use `tree` to generate the tree below.
 - attributes: all attributes we need (I am not using any in this example)
 - templates: all templates files (.erb files)
 
-### Install Hadoop on Ubuntu 14.04 Command List
+### Install systems on Ubuntu 14.04 Command List
+
+#### Hadoop
 
 If you want to manually configure hadoop, you can copy and paste the following commands:
 
@@ -91,12 +90,12 @@ sudo apt-get --assume-yes update
 sudo apt-get --assume-yes install default-jdk
 java -version
 sudo addgroup hadoop
-sudo adduser --ingroup hadoop hduser
-sudo adduser hduser sudo
+sudo adduser --ingroup hadoop bduser
+sudo adduser bduser sudo
 sudo apt-get install ssh
 which ssh
 which sshd
-su hduser
+su bduser
 ssh-keygen -t rsa -P ""
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys (authrized_keys is a file)
 ssh localhost
@@ -106,7 +105,7 @@ tar xvzf hadoop-2.6.0.tar.gz
 cd hadoop-2.6.0/
 sudo mkdir /usr/local/hadoop
 sudo mv * /usr/local/hadoop
-sudo chown -R hduser:hadoop /usr/local/hadoop
+sudo chown -R bduser:hadoop /usr/local/hadoop
 update-alternatives --config java
 ```
 
@@ -136,7 +135,7 @@ readlink -f /usr/bin/javac /usr/lib/jvm/java-7-openjdk-amd64/bin/javac
 
 ```
 sudo mkdir -p /app/hadoop/tmp
-sudo chown hduser:hadoop /app/hadoop/tmp
+sudo chown bduser:hadoop /app/hadoop/tmp
 ```
 
 `nano /usr/local/hadoop/etc/hadoop/core-site.xml`, enter the following (hadoop temp directory and hdfs uri):
@@ -208,7 +207,7 @@ enter the following:
 </configuration>
 ```
 
-make sure to use hduser: Format the New Hadoop Filesystem
+make sure to use bduser: Format the New Hadoop Filesystem
 
 `hadoop namenode -format`
 
@@ -249,7 +248,7 @@ http://localhost:50090/logs/ to see logs
 
 You can locally test the python mapper and reducer as follows:
 
-`echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py`
+`echo "foo foo bar labs foo bar" | /home/bduser/wc_mapper.py`
 
 ```
 foo	    1
@@ -260,7 +259,7 @@ foo	    1
 bar	    1
 ```
 
-`echo "foo foo bar labs foo bar" | /home/hduser/wc_mapper.py | sort -k1,1 | /home/hduser/wc_reducer.py`
+`echo "foo foo bar labs foo bar" | /home/bduser/wc_mapper.py | sort -k1,1 | /home/bduser/wc_reducer.py`
 
 ```
 bar	    2
@@ -270,13 +269,18 @@ labs	1
 
 `sort`: http://www.theunixschool.com/2012/08/linux-sort-command-examples.html
 
-example: `sort -t"," -k1,1 file` The format of '-k' is : '-km,n' where m is the starting key and n is the ending key. In other words, sort can be used to sort on a range of fields just like how the group by in sql does. In our case, since the sorting is on the 1st field alone, we speciy '1,1'. Note: For a file which has fields delimited by a space or a tab, there is no need to specify the "-t" option since the white space is the delimiter by default in sort.
+example: `sort -t"," -k1,1 file` The format of '-k' is : '-km,n' where m is the starting key and n is the ending key. In other words, sort can be used to sort on a range of fields just like how the group by in sql does. In our case, since the sorting is on the 1st field alone, we specify '1,1'. Note: For a file which has fields delimited by a space or a tab, there is no need to specify the "-t" option since the white space is the delimiter by default in sort.
+
+#### Spark
+
+If you want to manually configure spark, you can copy and paste the following commands (make sure hadoop 2.6.0 has been installed and configured):
 
 ### Other useful tips
 
-- To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user `sudo adduser hduser vboxsf` and then reboot `sudo reboot`)
+- To copy files from Ubuntu virtualbox: go to settings, add a shared folder, login to ubuntu, go to /media/your_shared_folder (you may need to add user `sudo adduser bduser vboxsf` and then reboot `sudo reboot`)
 - If you are starting a new cookbook, you can use `berks cookbook your_cookbook_name` to initialize the folder structure (no need to do this for this cookbook - I have done it for you). Refer to the following tutorial is necessary: use external cookbook: http://docs.aws.amazon.com/opsworks/latest/userguide/cookbooks-101-opsworks-berkshelf.html#cookbooks-101-opsworks-berkshelf-vagrant
 - You can add external cookbook in Berksfile as `cookbook 'java'`, you can go to https://supermarket.chef.io to search for a cookbook and find the related berkshelf information there.
+
 ### References
 
 - http://www.terpconnect.umd.edu/~kpzhang/ (special thanks to my friend Kunpeng for the course materials)
@@ -284,3 +288,4 @@ example: `sort -t"," -k1,1 file` The format of '-k' is : '-km,n' where m is the 
 - http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
 - https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison
 - https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef
+- https://www.linkedin.com/pulse/installing-hbase-112-over-hadoop-271in-modeon-ubuntu-1404-sharma

@@ -1,2 +1,2 @@
-include_recipe 'hadoop::setup'
-include_recipe 'hadoop::word_count'
+include_recipe 'bigdata::hadoop'
+include_recipe 'bigdata::spark'

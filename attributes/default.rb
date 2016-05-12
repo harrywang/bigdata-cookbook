@@ -1,1 +1,1 @@
-default['hadoop']['hadoop_user'] = 'hduser'
+default['bigdata']['bigdata_user'] = 'bduser'
