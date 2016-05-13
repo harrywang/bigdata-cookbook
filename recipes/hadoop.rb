@@ -71,7 +71,7 @@ end
 execute "extract hadoop 2.6.0" do
     user "root"
     cwd "/home/bduser"
-    command "tar xvzf hadoop-2.6.0.tar.gz"
+    command "tar -xzf hadoop-2.6.0.tar.gz"
 end
 
 execute "move hadoop 2.6.0" do
@@ -92,7 +92,10 @@ cookbook_file '/home/bduser/.bashrc' do
   action :create
 end
 
-bash 'source bashrc file' do
+bash 'source' do
+  user 'bduser'
+  group 'bigdata'
+  cwd '/home/bduser/'
   code 'source /home/bduser/.bashrc'
 end
 

@@ -1,7 +1,8 @@
 This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at https://supermarket.chef.io/. This cookbook is for learning and teaching purpose and only tested on Mac. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
 - Hadoop: hadoop recipe installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "[Imagine](https://www.youtube.com/watch?v=DVg2EJvvlF8)" by John Lennon) using Hadoop Streaming API.
-- Spark: spark recipe install spark 1.6.0. pre-built for Hadoop 2.6 and later.
+- Spark: spark recipe installs spark 1.6.0. pre-built for Hadoop 2.6 and later.
+- HBase: hbase recipe installs hbase 1.1.4.
 
 
 ### Instructions
@@ -28,24 +29,33 @@ You can follow the official tutorial at https://learn.chef.io/local-development/
     You need to login as the dbuser:
     - `su bduser` enter 'test' as the password
     - `cd ~` go to home
-    - `source ~/.bashrc` to setup environment (optional, if done, you can use `start-all.sh`, `hadoop`, `hdfs` commands without specifying the full path below)
 
     For Hadoop:
-    - `/usr/local/hadoop/sbin/start-all.sh` to start hadoop use `jps` to check
-    - `/usr/local/hadoop/bin/hdfs dfs -mkdir -p /data/input` create hadoop input folder `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/input` to remove
-    - `/usr/local/hadoop/bin/hdfs dfs -copyFromLocal ./data/imagine.txt /data/input` copy text file to input folder
-    - `/usr/local/hadoop/bin/hdfs dfs -ls /data/input` to view the input folder
-    - `/usr/local/hadoop/bin/hadoop jar hadoop-streaming-2.6.0.jar -mapper /home/bduser/programs/hadoop/wc_mapper.py -reducer /home/bduser/programs/hadoop/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
-    - `/usr/local/hadoop/bin/hdfs dfs -ls /data/output` to view the output folder
-    - `/usr/local/hadoop/bin/hdfs dfs -cat /data/output/part-00000` to view the word count result
-    - `/usr/local/hadoop/bin/hdfs dfs -rm -R /data/output` remove the output folder first if you want to re-run the program.
+    - `start-dfs.sh` and `start-yarn.sh` to start hadoop use `jps` to check
+    - `hdfs dfs -mkdir -p /data/input` create hadoop input folder `hdfs dfs -rm -R /data/input` to remove
+    - `hdfs dfs -copyFromLocal ./data/imagine.txt /data/input` copy text file to input folder
+    - `hdfs dfs -ls /data/input` to view the input folder
+    - `hadoop jar hadoop-streaming-2.6.0.jar -mapper /home/bduser/programs/hadoop/wc_mapper.py -reducer /home/bduser/programs/hadoop/wc_reducer.py -input /data/input/* -output /data/output` to run the word count python mapper and reducer
+    - `hdfs dfs -ls /data/output` to view the output folder
+    - `hdfs dfs -cat /data/output/part-00000` to view the word count result
+    - `hdfs dfs -rm -R /data/output` remove the output folder first if you want to re-run the program.
     - http://localhost:50070/ you can see the WebUI, if you need to do other part-forwarding, you can edit .kitchen.yml file.
     - to shutdown the virtual Ubuntu, run `sudo poweroff`
 
-    For Spark:
-    - `cd /home/bduser/spark-1.6.0-bin-hadoop2.6`
-    - To run Spark interactively in a Python interpreter: `./bin/pyspark --master local[2]`, the --master option specifies the master URL for a distributed cluster, or local to run locally with one thread, or local[N] to run locally with N threads.
-    - Run an example: `./bin/spark-submit examples/src/main/python/pi.py 10`
+    For Spark (make sure hadoop is up and running):
+    - `cd ~`
+    - To run Spark interactively in a Python interpreter: `pyspark --master local[2]`, the --master option specifies the master URL for a distributed cluster, or local to run locally with one thread, or local[N] to run locally with N threads. Then, you can enter the following code example line by line:
+    ```
+    text_file = sc.textFile("hdfs://localhost:54310/data/input/imagine.txt")
+    counts = text_file.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a + b)
+    counts.saveAsTextFile("hdfs://localhost:54310/data/output/count")
+    ```
+    - To run a Spark program directly (which print out the word count result to the console): `spark-submit $SPARK_INSTALL/examples/src/main/python/wordcount.py hdfs://localhost:54310/data/input/imagine.txt`. There are tons of Spark examples at `$SPARK_INSTALL/examples/src/main/python/`, which can be viewed directly at: https://github.com/apache/spark/tree/master/examples/src/main/python
+
+    For HBase (make sure hadoop is up and running):
+    - `start-hbase.sh` to start hbase, use `jps` to check: Hmaster, HregionServer, HquorumPeer, verify hbase HDFS directory has been created: `hadoop fs -ls /tmp/hbase-bduser`
+    - `hbase shell` to start hbase shell
+    - HBase WebUI: http://localhost:16010/master-status
 
 7. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
 
