@@ -299,3 +299,5 @@ If you want to manually configure spark, you can copy and paste the following co
 - https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison
 - https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef
 - https://www.linkedin.com/pulse/installing-hbase-112-over-hadoop-271in-modeon-ubuntu-1404-sharma
+- http://anggao.js.org/install-hive-on-ubuntu-1404-and-hadoop-260.html
+- https://mongodblog.wordpress.com/2016/02/27/apache-hive-2-0-0-installation-on-ubuntu-linux-14-04-lts/

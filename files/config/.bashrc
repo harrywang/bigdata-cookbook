@@ -79,3 +79,8 @@ export PATH=$PATH:$SPARK_INSTALL/sbin
 export HBASE_HOME=/usr/local/hbase
 export PATH=$PATH:$HBASE_HOME/bin
 #HBASE VARIABLES END
+
+#HIVE VARIABLES START
+export HIVE_HOME=/usr/local/hive
+export PATH=$PATH:$HIVE_HOME/bin
+#HIVE VARIABLES END
