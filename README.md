@@ -1,8 +1,9 @@
-This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at https://supermarket.chef.io/. This cookbook is for learning and teaching purpose and only tested on Mac. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
+This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at https://supermarket.chef.io/. This cookbook is for learning and teaching purpose and only tested on Mac. I try to add comments to the recipes to document the commands - I highly recommend reading the recipes to learn the installation and configuration details. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.
 
 - Hadoop: hadoop recipe installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "[Imagine](https://www.youtube.com/watch?v=DVg2EJvvlF8)" by John Lennon) using Hadoop Streaming API.
 - Spark: spark recipe installs spark 1.6.0. pre-built for Hadoop 2.6 and later.
-- HBase: hbase recipe installs hbase 1.1.4.
+- HBase: hbase recipe installs hbase 1.1.5.
+- Hive: hive recipe installs hive 2.0.0 with Derby as the metadata store
 
 
 ### Instructions
@@ -14,7 +15,7 @@ You can follow the official tutorial at https://learn.chef.io/local-development/
 
 3. Use cookbook dependency manager Berkshelf to download external cookbooks: run `berks install` to download the external cookbook. If you are using Mac, the external cookbooks are downloaded to ~/.berkshelf/cookbooks. For example, I use java cookbook (https://supermarket.chef.io/cookbooks/java) to install Oracle Java 7 - you can change the attributes in .kitchen.yml file (such as java version, etc).
 
-4. Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook only installs hadoop with word count example. If you want to setup other systems, you need to uncomment the corresponding recipes in /recipes/default.rb.
+4. Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook installs a few systems. If you want to setup a subset of the systems, you need to comment out the corresponding recipes in /recipes/default.rb.
 
 5. run `kitchen converge` to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. If things goes well, you have a Ubuntu 14.04 running with hadoop configured.
 
@@ -56,6 +57,18 @@ You can follow the official tutorial at https://learn.chef.io/local-development/
     - `start-hbase.sh` to start hbase, use `jps` to check: Hmaster, HregionServer, HquorumPeer, verify hbase HDFS directory has been created: `hadoop fs -ls /tmp/hbase-bduser`
     - `hbase shell` to start hbase shell
     - HBase WebUI: http://localhost:16010/master-status
+
+    For Hive (make sure hadoop is up and running):
+    - `cd $HIVE_HOME`
+    - then, do the following (only once)
+    ```
+    hdfs dfs -mkdir /tmp
+    hadoop fs -chmod g+w /tmp
+    hadoop fs -mkdir -p /user/hive/warehouse
+    hadoop fs -chmod g+w /user/hive/warehouse
+    ```
+    - `./bin/schematool -initSchema -dbType derby` to initialize Hive metadata store Derby (only once)
+    - `hive` to start hive shell. Try `show tables;` to confirm that hive is running properly.
 
 7. if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run `kitchen destroy` and then `kitchen converge` - Note: everything on the old virtual Ubuntu is deleted.
 
@@ -301,3 +314,4 @@ If you want to manually configure spark, you can copy and paste the following co
 - https://www.linkedin.com/pulse/installing-hbase-112-over-hadoop-271in-modeon-ubuntu-1404-sharma
 - http://anggao.js.org/install-hive-on-ubuntu-1404-and-hadoop-260.html
 - https://mongodblog.wordpress.com/2016/02/27/apache-hive-2-0-0-installation-on-ubuntu-linux-14-04-lts/
+- http://www.javamakeuse.com/2016/02/apache-hive-installation-in-ubuntu-hive.html

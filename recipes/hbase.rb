@@ -5,21 +5,21 @@ directory '/usr/local/hbase' do
     action :create
 end
 
-execute "download hbase 1.1.4" do
+execute "download hbase 1.1.5" do
     user "root"
     cwd "/home/bduser"
-    command "wget http://mirrors.koehn.com/apache/hbase/1.1.4/hbase-1.1.4-bin.tar.gz"
+    command "wget http://apache.claz.org/hbase/stable/hbase-1.1.5-bin.tar.gz"
 end
 
-execute "extract hbase 1.1.4" do
+execute "extract hbase" do
     user "root"
     cwd "/home/bduser"
-    command "tar -xzf hbase-1.1.4-bin.tar.gz"
+    command "tar -xzf hbase-1.1.5-bin.tar.gz"
 end
 
-execute "move spark 1.6.0" do
+execute "move hbase" do
     user "root"
-    cwd "/home/bduser/hbase-1.1.4"
+    cwd "/home/bduser/hbase-1.1.5"
     command "mv * /usr/local/hbase"
 end
 

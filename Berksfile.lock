@@ -3,7 +3,6 @@ DEPENDENCIES
     path: .
     metadata: true
   java (~> 1.39.0)
-  ssh_known_hosts
 
 GRAPH
   apt (3.0.0)
@@ -11,6 +10,3 @@ GRAPH
     java (>= 0.0.0)
   java (1.39.0)
     apt (>= 0.0.0)
-  partial_search (1.0.9)
-  ssh_known_hosts (2.0.0)
-    partial_search (>= 0.0.0)

@@ -1,21 +1,34 @@
+# Install Oracle Java 7 using java cookbook. Other Java may not work.
+# sudo add-apt-repository ppa:webupd8team/java
+# sudo apt-get update
+# sudo apt-get install oracle-java7-installer
 include_recipe 'java'
 
+# apt-get update downloads the package lists from the repositories
+# and "updates" them to get information on the newest versions of packages and their dependencies.
+# sudo apt-get update
 apt_update "update apt sources" do
    action :update
 end
 
+# optional - I use vim to edit files on server
 apt_package 'vim' do
   action :install
 end
 
+# ssh: used to connect to remote machines - the client.
+# sshd: the daemon on the server that allows clients to connect to the server.
+# The ssh is pre-enabled on Linux, but we need to install ssh to start sshd daemon.
 apt_package 'ssh' do
   action :install
 end
 
+# Add a dedicated big data group
 group 'bigdata' do
   action :create
 end
 
+# Add a dedicated big data user and add the user to the group above
 # use mkpasswd -m sha-512 to make a hash
 # the password is 'test'
 user 'bduser' do
@@ -24,11 +37,13 @@ user 'bduser' do
   password '$6$kiya1Zs6H2GJxdY$fgFnzKMYs/KN2rufpMio9asn4vtBuPRh5rYTspW.FJjzseQMk/3CvI5ipjUPODteS6tbKdQ9cwl032VO9f5Fb0'
 end
 
+# Add user to the sudoer list so that the user can use sudo direclty on the server if needed
 execute "add bduser to sudoer list" do
     user "root"
     command "adduser bduser sudo"
 end
 
+# Create a directory for ssh certificate
 directory '/home/bduser/.ssh/' do
   owner 'bduser'
   group 'bigdata'
@@ -37,6 +52,7 @@ directory '/home/bduser/.ssh/' do
   action :create
 end
 
+# generate a key without password
 execute "generate ssh keys for bduser" do
   user "bduser"
   group 'bigdata'
@@ -44,6 +60,8 @@ execute "generate ssh keys for bduser" do
   command "ssh-keygen -t rsa -q -f /home/bduser/.ssh/id_rsa -P \"\""
 end
 
+# Add the newly created key to the list of authorized keys
+# so that Hadoop can use ssh without prompting for a password
 execute "add key to authorized keys for password-less ssh" do
   user "bduser"
   group 'bigdata'
@@ -55,6 +73,7 @@ execute "change key permission" do
   command "chown bduser:bigdata /home/bduser/.ssh/authorized_keys"
 end
 
+# create hadoop home directory
 directory '/usr/local/hadoop' do
     owner 'bduser'
     group 'bigdata'
@@ -84,6 +103,7 @@ execute "update java alternatives" do
     command "update-alternatives --config java"
 end
 
+# configrure the environment variables
 cookbook_file '/home/bduser/.bashrc' do
   source '/config/.bashrc'
   owner 'bduser'
@@ -175,7 +195,7 @@ execute "download hadoop streaming jar 2.6.0" do
     command "wget http://central.maven.org/maven2/org/apache/hadoop/hadoop-streaming/2.6.0/hadoop-streaming-2.6.0.jar"
 end
 
-execute "chown hadoop streaming jar" do
+execute "change hadoop streaming jar permission" do
     user "root"
     command "chown bduser:bigdata /home/bduser/hadoop-streaming-2.6.0.jar"
 end
