@@ -19,12 +19,13 @@
     </section>
 
     <section class="main-content">
-      <p>This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at <a href="https://supermarket.chef.io/">https://supermarket.chef.io/</a>. This cookbook is for learning and teaching purpose and only tested on Mac. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.</p>
+      <p>This cookbook contains a number of recipes to setup a few systems for big data analytics. Note that there are professionally developed cookbooks for setting up those systems that can be found at <a href="https://supermarket.chef.io/">https://supermarket.chef.io/</a>. This cookbook is for learning and teaching purpose and only tested on Mac. I try to add comments to the recipes to document the commands - I highly recommend reading the recipes to learn the installation and configuration details. I referred to many online tutorials and articles as found in the references section at the end of this README - many thanks to those authors.</p>
 
 <ul>
 <li>Hadoop: hadoop recipe installs Hadoop 2.6.0 (single node cluster) on Ubuntu 14.04 and configures the system to run a simple word count python program (counting the words in the lyrics of the song "<a href="https://www.youtube.com/watch?v=DVg2EJvvlF8">Imagine</a>" by John Lennon) using Hadoop Streaming API.</li>
 <li>Spark: spark recipe installs spark 1.6.0. pre-built for Hadoop 2.6 and later.</li>
-<li>HBase: hbase recipe installs hbase 1.1.4.</li>
+<li>HBase: hbase recipe installs hbase 1.1.5.</li>
+<li>Hive: hive recipe installs hive 2.0.0 with Derby as the metadata store</li>
 </ul>
 
 <h3>
@@ -36,7 +37,7 @@
 <li><p>Install Chef Development Kit at <a href="https://downloads.chef.io/chef-dk/mac/">https://downloads.chef.io/chef-dk/mac/</a></p></li>
 <li><p>Install virtualization tools (VirtualBox and Vagrant) at <a href="https://learn.chef.io/local-development/rhel/get-set-up/">https://learn.chef.io/local-development/rhel/get-set-up/</a></p></li>
 <li><p>Use cookbook dependency manager Berkshelf to download external cookbooks: run <code>berks install</code> to download the external cookbook. If you are using Mac, the external cookbooks are downloaded to ~/.berkshelf/cookbooks. For example, I use java cookbook (<a href="https://supermarket.chef.io/cookbooks/java">https://supermarket.chef.io/cookbooks/java</a>) to install Oracle Java 7 - you can change the attributes in .kitchen.yml file (such as java version, etc).</p></li>
-<li><p>Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook only installs hadoop with word count example. If you want to setup other systems, you need to uncomment the corresponding recipes in /recipes/default.rb.</p></li>
+<li><p>Configuration (optional): the default system setting for this cookbook can be found in .kitchen.yml: Ubuntu 14.04, 2G RAM (512M is fine to run Hadoop example, more is need for Spark), some part forwarding settings. By default, this cookbook installs a few systems. If you want to setup a subset of the systems, you need to comment out the corresponding recipes in /recipes/default.rb.</p></li>
 <li>
 <p>run <code>kitchen converge</code> to start a Ubuntu instance and related configuration. Make sure you have fast Internet access when running this cookbook - we need to get many packages during this process, e.g., hadoop package itself is 186M. If things goes well, you have a Ubuntu 14.04 running with hadoop configured.</p>
 
@@ -115,6 +116,26 @@ counts.saveAsTextFile("hdfs://localhost:54310/data/output/count")
 <li>
 <code>hbase shell</code> to start hbase shell</li>
 <li>HBase WebUI: http://localhost:16010/master-status</li>
+</ul>
+
+<p>For Hive (make sure hadoop is up and running):</p>
+
+<ul>
+<li><code>cd $HIVE_HOME</code></li>
+<li>then, do the following (only once)</li>
+</ul>
+
+<pre><code>hdfs dfs -mkdir /tmp
+hadoop fs -chmod g+w /tmp
+hadoop fs -mkdir -p /user/hive/warehouse
+hadoop fs -chmod g+w /user/hive/warehouse
+</code></pre>
+
+<ul>
+<li>
+<code>./bin/schematool -initSchema -dbType derby</code> to initialize Hive metadata store Derby (only once)</li>
+<li>
+<code>hive</code> to start hive shell. Try <code>show tables;</code> to confirm that hive is running properly.</li>
 </ul>
 </li>
 <li><p>if you want to wipe out everything and start with a clean slate (in case something messed up), you can simply run <code>kitchen destroy</code> and then <code>kitchen converge</code> - Note: everything on the old virtual Ubuntu is deleted.</p></li>
@@ -368,6 +389,9 @@ labs    1
 <li><a href="https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison">https://www.linkedin.com/pulse/getting-started-apache-spark-ubuntu-1404-myles-harrison</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef">https://www.digitalocean.com/community/tutorial_series/getting-started-managing-your-infrastructure-using-chef</a></li>
 <li><a href="https://www.linkedin.com/pulse/installing-hbase-112-over-hadoop-271in-modeon-ubuntu-1404-sharma">https://www.linkedin.com/pulse/installing-hbase-112-over-hadoop-271in-modeon-ubuntu-1404-sharma</a></li>
+<li><a href="http://anggao.js.org/install-hive-on-ubuntu-1404-and-hadoop-260.html">http://anggao.js.org/install-hive-on-ubuntu-1404-and-hadoop-260.html</a></li>
+<li><a href="https://mongodblog.wordpress.com/2016/02/27/apache-hive-2-0-0-installation-on-ubuntu-linux-14-04-lts/">https://mongodblog.wordpress.com/2016/02/27/apache-hive-2-0-0-installation-on-ubuntu-linux-14-04-lts/</a></li>
+<li><a href="http://www.javamakeuse.com/2016/02/apache-hive-installation-in-ubuntu-hive.html">http://www.javamakeuse.com/2016/02/apache-hive-installation-in-ubuntu-hive.html</a></li>
 </ul>
 
       <footer class="site-footer">
@@ -377,14 +401,7 @@ labs    1
       </footer>
 
     </section>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-126223-8', 'auto');
-  ga('send', 'pageview');
-</script>
+
   
   </body>
 </html>
